@@ -1,13 +1,14 @@
 //
 // Home of the main server object
 //
+require('coffee-script')
 var express = require('express'),
     env = require('./lib/env'),
     mw = require('./middleware'),
     DataAdapter = require('./lib/data_adapter'),
     rendrServer = require('rendr').server,
     rendrMw = require('rendr/server/middleware'),
-    viewEngine = require('rendr/server/viewEngine'),
+    viewEngine = require('../rendr-teacup/server/viewEngine'),
     app;
 
 app = express();
@@ -42,8 +43,8 @@ function initMiddleware() {
   app.configure(function() {
     // set up views
     app.set('views', __dirname + '/../app/views');
-    app.set('view engine', 'js');
-    app.engine('js', viewEngine);
+    app.set('view engine', 'coffee');
+    app.engine('coffee', viewEngine);
 
     // set the middleware stack
     app.use(express.compress());

@@ -28,37 +28,14 @@ module.exports = function(grunt) {
       }
     },
 
-    handlebars: {
-      compile: {
-        options: {
-          namespace: false,
-          commonjs: true,
-          processName: function(filename) {
-            return filename.replace('app/templates/', '').replace('.hbs', '');
-          }
-        },
-        src: "app/templates/*.hbs",
-        dest: "app/templates/compiledTemplates.js",
-        filter: function(filepath) {
-          var filename = path.basename(filepath);
-          // Exclude files that begin with '__' from being sent to the client,
-          // i.e. __layout.hbs.
-          return filename.slice(0, 2) !== '__';
-        }
-      }
-    },
-
     watch: {
       scripts: {
-        files: 'app/**/*.js',
+        files: [
+          'app/**/*.js',
+          'app/**/*.coffee',
+          'rendr-teacup/**/*.coffee'
+        ],
         tasks: ['rendr_stitch'],
-        options: {
-          interrupt: true
-        }
-      },
-      templates: {
-        files: 'app/**/*.hbs',
-        tasks: ['handlebars'],
         options: {
           interrupt: true
         }
@@ -84,13 +61,17 @@ module.exports = function(grunt) {
           ],
           aliases: [
             {from: rendrDir + '/client', to: 'rendr/client'},
-            {from: rendrDir + '/shared', to: 'rendr/shared'}
+            {from: rendrDir + '/shared', to: 'rendr/shared'},
+            {from: 'node_modules/teacup/lib/teacup', to: 'teacup'}
           ]
         },
         files: [{
           dest: 'public/mergedAssets.js',
           src: [
             'app/**/*.js',
+            'app/**/*.coffee',
+            'rendr-teacup/**/*.coffee',
+            'node_modules/teacup/lib/teacup.js',
             rendrDir + '/client/**/*.coffee',
             rendrDir + '/shared/**/*.coffee'
           ]
@@ -101,11 +82,10 @@ module.exports = function(grunt) {
 
   grunt.loadNpmTasks('grunt-contrib-stylus');
   grunt.loadNpmTasks('grunt-contrib-watch');
-  grunt.loadNpmTasks('grunt-contrib-handlebars');
   grunt.loadNpmTasks('grunt-bg-shell');
   grunt.loadNpmTasks('grunt-rendr-stitch');
 
-  grunt.registerTask('compile', ['handlebars', 'rendr_stitch', 'stylus']);
+  grunt.registerTask('compile', ['rendr_stitch', 'stylus']);
 
   // Run the server and watch for file changes
   grunt.registerTask('server', ['bgShell:runNode', 'compile', 'watch']);
